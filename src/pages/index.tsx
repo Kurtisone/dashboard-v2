@@ -24,17 +24,12 @@ import { useRegVotingPower } from 'src/hooks/useREGVotingPower'
 import { useRWA } from 'src/hooks/useRWA'
 import { useMemo } from 'react'
 
-import { /* AssetsViewSearch, */ useAssetsViewSearch } from 'src/components/assetsView/AssetsViewSearch'
-// import { AssetsViewSelect, useAssetsViewSelect } from 'src/components/assetsView/assetsViewSelect'
-// import { AssetsViewFilterButton } from 'src/components/assetsView/filters/AssetsViewFilterButton'
-// import { RealtimeIndicator } from 'src/components/assetsView/indicators/RealtimeIndicator'
-// import { AssetViewType } from 'src/components/assetsView/types'
-// import { AssetGrid, AssetTable } from 'src/components/assetsView/views'
+import { useAssetsViewSearch } from 'src/components/assetsView/AssetsViewSearch'
 
 const HomePage: NextPage = () => {
 
   const { assetsViewFilterFunction } = useAssetsViewFilters()
-  const { assetSearchFunction/* , assetSearchProps */ } = useAssetsViewSearch()
+  const { assetSearchFunction } = useAssetsViewSearch()
 
   const realtokens = useSelector(selectUserRealtokens)
   const rwa = useRWA()
@@ -61,7 +56,6 @@ const HomePage: NextPage = () => {
     assetSearchFunction,
     assetsViewFilterFunction,
   ])
-
 
   const otherAssetsData = useMemo(() => {
     const assets = {

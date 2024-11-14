@@ -1,16 +1,12 @@
-import { FC, useMemo } from 'react'
+import { FC } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import { Box, Card, Text, Title } from '@mantine/core'
 import { IconArchive, IconBolt, IconBoltOff } from '@tabler/icons'
 
-// import { useREG } from 'src/hooks/useREG'
-// import { useRegVotingPower } from 'src/hooks/useREGVotingPower'
-// import { useRWA } from 'src/hooks/useRWA'
 import {
   OtherRealtoken,
-  UserRealtoken,
 } from 'src/store/features/wallets/walletsSelector'
 
 import { selectTransfersIsLoaded } from 'src/store/features/transfers/transfersSelector'
@@ -35,10 +31,6 @@ export const SummaryCard: FC<SummaryCardProps> = ({ otherAssetsData }) => {
   const realtokensValue = useSelector(selectOwnedRealtokensValue)
   const rmmDetails = useSelector(selectRmmDetails)
   const transfersIsLoaded = useSelector(selectTransfersIsLoaded)
-
-  // const rwa = useRWA()
-  // const reg = useREG()
-  // const regVotingPower = useRegVotingPower()
 
   const stableDepositValue = rmmDetails.stableDeposit
   const stableDebtValue = rmmDetails.stableDebt
