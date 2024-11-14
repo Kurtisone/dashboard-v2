@@ -11,12 +11,12 @@ import { OtherRealtoken } from 'src/store/features/wallets/walletsSelector'
 import { Divider } from '../commons'
 import styles from './AssetCard.module.sass'
 
-interface RWACardProps {
+interface OtherAssetCardProps {
   value: OtherRealtoken
   onClick?: (id: string) => unknown
 }
 
-const RWACardComponent: FC<RWACardProps> = (props) => {
+const OtherAssetCardComponent: FC<OtherAssetCardProps> = (props) => {
   const { t: tNumbers } = useTranslation('common', { keyPrefix: 'numbers' })
   const { t } = useTranslation('common', { keyPrefix: 'assetCard' })
 
@@ -80,4 +80,4 @@ const RWACardComponent: FC<RWACardProps> = (props) => {
   )
 }
 
-export const OtherAssetCard = memo(RWACardComponent)
+export const OtherAssetCard = memo(OtherAssetCardComponent)
