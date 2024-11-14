@@ -24,7 +24,7 @@ import {
   SubsidyStatusTag,
 } from '../commons'
 import styles from './AssetCard.module.sass'
-import { RWACard } from './RWACard'
+import { OtherAssetCard } from './OtherAssetCard'
 
 interface AssetCardProps {
   value: UserRealtoken | OtherRealtoken
@@ -192,6 +192,6 @@ export const AssetCard: FC<AssetCardProps> = (props) => {
       />
     )
   } else {
-    return <RWACard value={props.value as OtherRealtoken} />
+    return <OtherAssetCard value={props.value as OtherRealtoken} />
   }
 }

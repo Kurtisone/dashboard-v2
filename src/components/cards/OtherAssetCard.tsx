@@ -80,4 +80,4 @@ const RWACardComponent: FC<RWACardProps> = (props) => {
   )
 }
 
-export const RWACard = memo(RWACardComponent)
+export const OtherAssetCard = memo(RWACardComponent)
