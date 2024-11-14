@@ -52,7 +52,6 @@ export interface OtherRealtoken {
   unitPriceCost: number
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface RWARealtoken extends OtherRealtoken {
   initialLaunchDate: APIRealTokenDate
 }
