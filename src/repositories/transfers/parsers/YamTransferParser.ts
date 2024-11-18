@@ -11,6 +11,7 @@ import { findRealToken } from 'src/utils/realtoken/findRealToken'
 
 import { RealTokenTransfer, TransferOrigin } from '../transfers.type'
 import { TransferParser } from './TransferParser'
+import { CHAIN_ID__GNOSIS_XDAI } from 'src/utils/blockchain/consts/misc'
 
 export class YamTransferParser extends TransferParser {
   protected defaultOrigin = TransferOrigin.yam
@@ -135,7 +136,7 @@ export class YamTransferParser extends TransferParser {
 
     return {
       id: `${realtokenTransfer.txHash}-${realtokenTransfer.index}`,
-      chainId: 100,
+      chainId: CHAIN_ID__GNOSIS_XDAI,
       realtoken:
         findRealToken(realtokenTransfer.address, this.realtokenList)?.uuid ??
         '',
@@ -168,7 +169,7 @@ export class YamTransferParser extends TransferParser {
 
       return {
         id: `${item.txHash}-${item.index}`,
-        chainId: 100,
+        chainId: CHAIN_ID__GNOSIS_XDAI,
         realtoken: findRealToken(item.address, this.realtokenList)?.uuid ?? '',
         from: item.from,
         to: item.to,

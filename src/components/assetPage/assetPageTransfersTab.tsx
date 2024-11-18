@@ -7,6 +7,7 @@ import { useCurrencyValue } from 'src/hooks/useCurrencyValue'
 import { useTransferValues } from 'src/hooks/useTransferValues'
 import { UserRealTokenTransfer } from 'src/repositories/transfers/transfers.type'
 import { UserRealtoken } from 'src/store/features/wallets/walletsSelector'
+import { CHAIN_ID__ETHEREUM } from 'src/utils/blockchain/consts/misc'
 
 const TransferRow: FC<{ item: UserRealTokenTransfer }> = ({ item }) => {
   const { t } = useTranslation('common', {
@@ -19,7 +20,7 @@ const TransferRow: FC<{ item: UserRealTokenTransfer }> = ({ item }) => {
 
   const txId = item.id.replace(/-.*/, '')
   const explorerLink =
-    item.chainId === 1
+    item.chainId === CHAIN_ID__ETHEREUM
       ? `https://etherscan.io/tx/${txId}`
       : `https://gnosisscan.io/tx/${txId}`
 
@@ -43,7 +44,7 @@ const TransferRow: FC<{ item: UserRealTokenTransfer }> = ({ item }) => {
               color: 'gray',
             }}
           >
-            {` (${item.chainId === 1 ? t('etherScan') : t('gnosisScan')})`}
+            {` (${item.chainId === CHAIN_ID__ETHEREUM ? t('etherScan') : t('gnosisScan')})`}
           </Anchor>
         </div>
       </td>

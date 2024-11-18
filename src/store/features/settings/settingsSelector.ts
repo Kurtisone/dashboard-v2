@@ -82,3 +82,8 @@ export const selectUserIncludesOtherAssets = createSelector(
   (state: RootState) => state.settings,
   (state) => state.includesOtherAssets,
 )
+
+export const selectUserIncludesLPs = createSelector(
+  (state: RootState) => state.settings,
+  (state) => state.includesLPs,
+)

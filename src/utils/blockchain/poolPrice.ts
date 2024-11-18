@@ -1,7 +1,8 @@
-import { Contract, JsonRpcProvider, ethers } from 'ethers'
+import { /* Contract, */ JsonRpcProvider, ethers } from 'ethers'
 
 import { LevinswapABI as UniswapV2PairABI } from './abi/LevinswapABI'
-import { UniswapV2FactoryABI } from './abi/UniswapV2FactoryABI'
+// import { UniswapV2FactoryABI } from './abi/UniswapV2FactoryABI'
+import { getFactoryContract, getUniV2PairAddress, LP_TYPES } from './lpInfos'
 
 const isAddressLowererThan = (address0: string, address1: string): boolean => {
   if (!address0 || !address1) {
@@ -9,23 +10,6 @@ const isAddressLowererThan = (address0: string, address1: string): boolean => {
     return false
   }
   return address0.toLowerCase() < address1.toLowerCase()
-}
-
-const getUniV2PairAddress = async (
-  factoryContract: Contract,
-  tokenAddress0: string,
-  tokenAddress1: string,
-): Promise<string> => {
-  try {
-    const pairAddress = await factoryContract.getPair(
-      tokenAddress0,
-      tokenAddress1,
-    )
-    return pairAddress
-  } catch (error) {
-    console.error('Failed to get pair address', error)
-  }
-  return ''
 }
 
 const getUniV2AssetPriceFromReserves = (
@@ -90,11 +74,20 @@ const getUniV2AssetPrice = async (
 ): Promise<number | null> => {
   let price: number | null = null
   try {
-    const factoryContract = new ethers.Contract(
+    // const factoryContract = new ethers.Contract(
+    //   factoryAddress,
+    //   UniswapV2FactoryABI,
+    //   provider,
+    // )
+    const factoryContract = getFactoryContract(
       factoryAddress,
-      UniswapV2FactoryABI,
       provider,
+      LP_TYPES.UNIV2,
     )
+    if (!factoryContract) {
+      console.error(`Failed to get factory contract for ${factoryAddress} , provider:`, provider)
+      return null
+    }
     const pairAddress = await getUniV2PairAddress(
       factoryContract,
       token0Address,

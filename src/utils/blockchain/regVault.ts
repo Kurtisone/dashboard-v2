@@ -18,7 +18,7 @@ const getAddressesLockedBalances = async (
   addressList: string[],
   providers: JsonRpcProvider[],
   consoleWarnOnError = false,
-) => {
+): Promise<number> => {
   let totalAmount = 0
   try {
     if (!contractAddress) {

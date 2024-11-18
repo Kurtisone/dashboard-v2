@@ -1,6 +1,7 @@
 import { gql } from '@apollo/client'
 
 import { EthereumClient, GnosisClient } from '../clients'
+import { CHAIN_ID__ETHEREUM, CHAIN_ID__GNOSIS_XDAI } from 'src/utils/blockchain/consts/misc'
 
 export async function getRealTokenTransfers(options: {
   addressList: string[]
@@ -9,8 +10,8 @@ export async function getRealTokenTransfers(options: {
   const addressList = options.addressList.map((item) => item.toLowerCase())
   const timestamp = options.timestamp
   const [ethereumResults, gnosisResults] = await Promise.all([
-    executeQuery(addressList, 1, timestamp),
-    executeQuery(addressList, 100, timestamp),
+    executeQuery(addressList, CHAIN_ID__ETHEREUM, timestamp),
+    executeQuery(addressList, CHAIN_ID__GNOSIS_XDAI, timestamp),
   ])
   return [...ethereumResults, ...gnosisResults].sort(
     (a, b) => parseInt(a.timestamp) - parseInt(b.timestamp),
@@ -25,8 +26,8 @@ async function executeQuery(
   const limit = 1000
 
   const client = {
-    [1]: EthereumClient,
-    [100]: GnosisClient,
+    [CHAIN_ID__ETHEREUM]: EthereumClient,
+    [CHAIN_ID__GNOSIS_XDAI]: GnosisClient,
   }[chainId]
 
   if (!client) throw new Error(`Chain ID ${chainId} is not supported`)

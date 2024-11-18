@@ -15,7 +15,7 @@ import {
   DEFAULT_RWA_PRICE,
   HoneySwapFactory_Address,
   RWA_ContractAddress,
-  RWA_asset_ID,
+  AssetIDs,
   RWAtokenDecimals,
   USDConXdai_ContractAddress,
   USDCtokenDecimals,
@@ -75,7 +75,7 @@ const getRWA = async (
   const totalInvestment = totalTokens * tokenPrice
 
   return {
-    id: `${RWA_asset_ID}`,
+    id: `${AssetIDs.RWA}`,
     fullName: 'RWA Holdings SA, Neuchatel, NE, Suisse',
     shortName: 'RWA',
     amount,

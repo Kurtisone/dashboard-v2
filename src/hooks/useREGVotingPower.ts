@@ -9,7 +9,7 @@ import { REGVotingPowertoken } from 'src/store/features/wallets/walletsSelector'
 import { ERC20ABI } from 'src/utils/blockchain/abi/ERC20ABI'
 import {
   DEFAULT_REGVotingPower_PRICE,
-  REGVotingPower_asset_ID,
+  AssetIDs,
   REGVotingPowertokenDecimals,
   RegVotingPower_ContractAddress,
 } from 'src/utils/blockchain/consts/otherTokens'
@@ -41,7 +41,7 @@ const getRegVotingPower = async (
   const totalInvestment = tokenPrice * totalTokens
 
   return {
-    id: `${REGVotingPower_asset_ID}`,
+    id: `${AssetIDs.REGVotingPower}`,
     fullName: 'REG Voting Power Registry',
     shortName: 'REG VOTING POWER',
     amount,

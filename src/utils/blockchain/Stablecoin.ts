@@ -1,9 +1,8 @@
 import { ethers } from 'ethers'
+import { USDConXdai_ContractAddress, WXDAI_ContractAddress } from './consts/otherTokens'
 
-export const UsdcAddress =
-  '0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83'.toLowerCase()
-export const WxdaiAddress =
-  '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'.toLowerCase()
+export const UsdcAddress = USDConXdai_ContractAddress.toLowerCase()
+export const WxdaiAddress = WXDAI_ContractAddress.toLowerCase()
 export const ArmmWXDAI =
   '0x7349c9eaa538e118725a6130e0f8341509b9f8a0'.toLowerCase()
 export const Armmv3WXDAI =

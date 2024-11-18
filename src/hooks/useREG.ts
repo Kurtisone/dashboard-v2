@@ -8,6 +8,7 @@ import { selectUserCurrency } from 'src/store/features/currencies/currenciesSele
 import {
   selectUserAddressList,
   selectUserIncludesEth,
+  selectUserIncludesOtherAssets,
 } from 'src/store/features/settings/settingsSelector'
 import { REGRealtoken } from 'src/store/features/wallets/walletsSelector'
 import { ERC20ABI } from 'src/utils/blockchain/abi/ERC20ABI'
@@ -16,7 +17,7 @@ import {
   HoneySwapFactory_Address,
   REG_ContractAddress,
   REG_VaultContractAddress,
-  REG_asset_ID,
+  AssetIDs,
   REGtokenDecimals,
   USDConXdai_ContractAddress,
   USDCtokenDecimals,
@@ -29,6 +30,8 @@ import {
   getUniV2AssetPrice,
 } from 'src/utils/blockchain/poolPrice'
 import { getAddressesLockedBalances } from 'src/utils/blockchain/regVault'
+import { getAddressesLpBalances } from 'src/utils/blockchain/lpInfos'
+
 
 const getREG = async (
   addressList: string[],
@@ -55,6 +58,16 @@ const getREG = async (
     addressList,
     providers,
   )
+
+  // TODO: add check on LP balance SWITCH: selectUserIncludesOtherAssets
+  const lpBalance = await getAddressesLpBalances(
+    REG_ContractAddress,
+    addressList,
+    providers,
+    true, // warnOnError TRUE for debug
+  )
+
+  console.debug(`lp balance= ${lpBalance}`)
 
   const totalAmount = availableBalance + lockedBalance
   const contractRegTotalSupply = await RegContract_Gnosis.totalSupply()
@@ -85,7 +98,7 @@ const getREG = async (
   const totalInvestment = totalTokens * tokenPrice
 
   return {
-    id: `${REG_asset_ID}`,
+    id: `${AssetIDs.REG}`,
     fullName: 'RealToken Ecosystem Governance',
     shortName: 'REG',
     amount,

@@ -1,6 +1,8 @@
-const RWA_asset_ID = 0
-const REG_asset_ID = 1
-const REGVotingPower_asset_ID = 2
+enum AssetIDs {
+  RWA,
+  REG,
+  REGVotingPower
+}
 
 // Gnosis/xDai, Ethereum
 const RWA_ContractAddress = '0x0675e8F4A52eA6c845CB6427Af03616a2af42170'
@@ -15,6 +17,9 @@ const RegVotingPower_ContractAddress =
 const WXDAI_ContractAddress = '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'
 const USDConXdai_ContractAddress = '0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83'
 
+// GNO on XDAI
+const GNO_ContractAddress = '0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb'
+
 const DEFAULT_RWA_PRICE = 50 // USD
 const DEFAULT_REG_PRICE = 0 // USD
 const DEFAULT_REGVotingPower_PRICE = 0 // USD
@@ -24,7 +29,10 @@ const REGtokenDecimals = 18
 const REGVotingPowertokenDecimals = 18
 const USDCtokenDecimals = 6
 const WXDAItokenDecimals = 18
+const GNOtokenDecimals = 18
 
+// Factories
+// UNI-V2
 const HoneySwapFactory_Address = '0xA818b4F111Ccac7AA31D0BCc0806d64F2E0737D7'
 
 export {
@@ -34,16 +42,16 @@ export {
   RegVotingPower_ContractAddress,
   WXDAI_ContractAddress,
   USDConXdai_ContractAddress,
+  GNO_ContractAddress,
   WXDAItokenDecimals,
   RWAtokenDecimals,
   USDCtokenDecimals,
   REGtokenDecimals,
+  GNOtokenDecimals,
   HoneySwapFactory_Address,
   REGVotingPowertokenDecimals,
   DEFAULT_RWA_PRICE,
   DEFAULT_REG_PRICE,
   DEFAULT_REGVotingPower_PRICE,
-  RWA_asset_ID,
-  REG_asset_ID,
-  REGVotingPower_asset_ID,
+  AssetIDs
 }

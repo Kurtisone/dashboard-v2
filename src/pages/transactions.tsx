@@ -34,6 +34,7 @@ import {
 } from 'src/store/features/wallets/walletsSelector'
 
 import styles from './TransactionsPage.module.sass'
+import { CHAIN_ID__ETHEREUM } from 'src/utils/blockchain/consts/misc'
 
 const TransferItem: FC<{
   transfer: UserRealTokenTransfer
@@ -52,7 +53,7 @@ const TransferItem: FC<{
   const values = formatTransferValues(transfer)
   const txId = transfer.id.replace(/-.*/, '')
   const explorerLink =
-    transfer.chainId === 1
+    transfer.chainId === CHAIN_ID__ETHEREUM
       ? `https://etherscan.io/tx/${txId}`
       : `https://gnosisscan.io/tx/${txId}`
 
@@ -105,7 +106,7 @@ const TransferItem: FC<{
               color: 'gray',
             }}
           >
-            {` (${transfer.chainId === 1 ? t('etherScan') : t('gnosisScan')})`}
+            {` (${transfer.chainId === CHAIN_ID__ETHEREUM ? t('etherScan') : t('gnosisScan')})`}
           </Anchor>
         </div>
         <div>{values.title}</div>

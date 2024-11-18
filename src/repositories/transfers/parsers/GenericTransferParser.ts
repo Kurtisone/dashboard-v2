@@ -9,6 +9,7 @@ import { findRealToken } from 'src/utils/realtoken/findRealToken'
 
 import { RealTokenTransfer, TransferOrigin } from '../transfers.type'
 import { TransferParser } from './TransferParser'
+import { CHAIN_ID__ETHEREUM } from 'src/utils/blockchain/consts/misc'
 
 export class GenericTransferParser extends TransferParser {
   canHandleTransferEvent(): boolean {
@@ -96,7 +97,7 @@ export class GenericTransferParser extends TransferParser {
     )
 
     const realtokenContractList = this.realtokenList.map((item) =>
-      transfer.chainId === 1
+      transfer.chainId === CHAIN_ID__ETHEREUM
         ? item.ethereumContract?.toLowerCase()
         : item.xDaiContract?.toLowerCase(),
     )

@@ -1,0 +1,7 @@
+const CHAIN_ID__ETHEREUM = 1
+const CHAIN_ID__GNOSIS_XDAI = 100
+
+export {
+  CHAIN_ID__ETHEREUM,
+  CHAIN_ID__GNOSIS_XDAI,
+}

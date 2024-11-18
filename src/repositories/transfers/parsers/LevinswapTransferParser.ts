@@ -11,6 +11,7 @@ import { findRealToken } from 'src/utils/realtoken/findRealToken'
 
 import { RealTokenTransfer, TransferOrigin } from '../transfers.type'
 import { TransferParser } from './TransferParser'
+import { CHAIN_ID__GNOSIS_XDAI } from 'src/utils/blockchain/consts/misc'
 
 export class LevinswapTransferParser extends TransferParser {
   protected defaultOrigin = TransferOrigin.levinSwapUnknown
@@ -95,7 +96,7 @@ export class LevinswapTransferParser extends TransferParser {
 
   async getLevinswapEventsFromTx(transactionId: string) {
     try {
-      const receipt = await getTransactionReceipt(transactionId, 100)
+      const receipt = await getTransactionReceipt(transactionId, CHAIN_ID__GNOSIS_XDAI)
       const logs = receipt?.logs ?? []
 
       return {
@@ -162,7 +163,7 @@ export class LevinswapTransferParser extends TransferParser {
         if (realtoken && assetTransfer && poolTransfer) {
           return {
             id: `${tokenTransfer.txHash}-${tokenTransfer.index}`,
-            chainId: 100,
+            chainId: CHAIN_ID__GNOSIS_XDAI,
             realtoken: realtoken.uuid,
             from: tokenTransfer.from,
             to: tokenTransfer.to,
@@ -220,7 +221,7 @@ export class LevinswapTransferParser extends TransferParser {
         if (realtoken && assetTransfer && poolTransfer) {
           return {
             id: `${tokenTransfer.txHash}-${tokenTransfer.index}`,
-            chainId: 100,
+            chainId: CHAIN_ID__GNOSIS_XDAI,
             realtoken: realtoken.uuid,
             from: tokenTransfer.from,
             to: tokenTransfer.to,
@@ -278,7 +279,7 @@ export class LevinswapTransferParser extends TransferParser {
 
           return {
             id: `${realtokenTransfer.txHash}-${realtokenTransfer.index}`,
-            chainId: 100,
+            chainId: CHAIN_ID__GNOSIS_XDAI,
             realtoken: realtoken.uuid,
             from: realtokenTransfer.from,
             to: realtokenTransfer.to,

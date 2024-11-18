@@ -40,6 +40,7 @@ import {
   selectUserCurrency,
   selectUserIncludesEth,
   selectUserIncludesLevinSwap,
+  selectUserIncludesLPs,
   selectUserIncludesOtherAssets,
   selectUserIncludesRmmV2,
   selectUserRentCalculation,
@@ -49,6 +50,7 @@ import {
   userCurrencyChanged,
   userIncludesEthChanged,
   userIncludesLevinSwapChanged,
+  userIncludesLPsChanged,
   userIncludesOtherAssetsChanged,
   userIncludesRmmV2Changed,
   userRentCalculationChanged,
@@ -256,6 +258,7 @@ const FetchDataSettings: FC = () => {
   const userIncludesLevinSwap = useSelector(selectUserIncludesLevinSwap)
   const userIncludesRmmV2 = useSelector(selectUserIncludesRmmV2)
   const userIncludesOtherAssets = useSelector(selectUserIncludesOtherAssets)
+  const userIncludesLPs = useSelector(selectUserIncludesLPs)
 
   const setUserIncludesEth = (value: boolean) =>
     dispatch(userIncludesEthChanged(value))
@@ -265,6 +268,8 @@ const FetchDataSettings: FC = () => {
     dispatch(userIncludesRmmV2Changed(value))
   const setUserIncludesOtherAssets = (value: boolean) =>
     dispatch(userIncludesOtherAssetsChanged(value))
+  const setUserIncludesLPs = (value: boolean) =>
+    dispatch(userIncludesLPsChanged(value))
 
   return (
     <>
@@ -295,6 +300,7 @@ const FetchDataSettings: FC = () => {
         label={t('includesRmmV2')}
         style={{ margin: '4px 8px' }}
       />
+      <Menu.Label pb={0}>{t('otherAssets')}</Menu.Label>
       <Switch
         checked={userIncludesOtherAssets}
         onChange={(event) =>
@@ -303,6 +309,16 @@ const FetchDataSettings: FC = () => {
         label={t('includesOtherAssets')}
         onLabel={<IconCoins size={16} />}
         offLabel={<IconHome size={16} />}
+        style={{ margin: '4px 8px' }}
+      />
+      <Switch
+        checked={userIncludesLPs}
+        onChange={(event) =>
+          setUserIncludesLPs(event.currentTarget.checked)
+        }
+        label={t('includesLPs')}
+        onLabel={<IconDatabase size={16} />}
+        offLabel={<IconDatabaseOff size={16} />}
         style={{ margin: '4px 8px' }}
       />
     </>

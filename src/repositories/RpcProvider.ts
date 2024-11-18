@@ -1,4 +1,5 @@
 import { ethers } from 'ethers'
+import { CHAIN_ID__ETHEREUM } from 'src/utils/blockchain/consts/misc'
 
 import { WaitingQueue } from 'src/utils/waitingQueue'
 
@@ -75,7 +76,7 @@ export async function getTransactionReceipt(
 
   const { GnosisRpcProvider, EthereumRpcProvider } = await initializeProviders()
 
-  const RpcProvider = chainId === 1 ? EthereumRpcProvider : GnosisRpcProvider
+  const RpcProvider = chainId === CHAIN_ID__ETHEREUM ? EthereumRpcProvider : GnosisRpcProvider
 
   do {
     receipt = await RpcProvider.getTransactionReceipt(transactionId)
