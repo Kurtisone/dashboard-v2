@@ -7,7 +7,8 @@ import { GNO_ContractAddress, HoneySwapFactory_Address, REG_ContractAddress, RWA
 import { CHAIN_ID__ETHEREUM, CHAIN_ID__GNOSIS_XDAI } from './consts/misc'
 import { UniswapV2FactoryABI } from './abi/UniswapV2FactoryABI'
 import { Interface } from 'ethers/lib.commonjs/abi'
-
+import { batchCallOneFunction } from './contract'
+import { getErc20AbiBalanceOfOnly } from 'src/utils/blockchain/ERC20'
 // const LP_TYPE_UNIV2 = 2
 // const LP_TYPE_UNIV3 = 3
 
@@ -261,21 +262,93 @@ const getAddressesBalances = async (
   erc20Addresses: string[],
   providers: JsonRpcProvider[],
   consoleWarnOnError = false,
-): Promise<number[]> => {
-  const balances: number[] = []
+): Promise<bigint[][]> => {
+  const balances: bigint[][] = []
   try {
     if (!userAddressList?.length) {
       consoleWarnOnError && console.error('Empty/Null/Invalid user address list')
       return balances
     }
-  if (!erc20Addresses?.length) {
-    consoleWarnOnError && console.error('Empty/Null/Invalid erc20Addresses')
-    return balances
-  }
-  if (!providers?.length) {
+    if (!erc20Addresses?.length) {
+      consoleWarnOnError && console.error('Empty/Null/Invalid erc20Addresses')
+      return balances
+    }
+    if (!providers?.length) {
       consoleWarnOnError && console.error('Empty/Null/Invalid providers')
       return balances
     }
+    const erc20AbiBalanceOfOnly = getErc20AbiBalanceOfOnly()
+    if (!erc20AbiBalanceOfOnly) {
+      throw new Error('balanceOf ABI not found')
+    }
+    const erc20Contracts = erc20Addresses.map((erc20Address) => {
+      return new Contract(
+        erc20Address,
+        // ['function balanceOf(address) public view returns (uint256)'],
+        erc20AbiBalanceOfOnly,
+        providers[0]
+      )
+    })
+    console.debug(`erc20Contracts:`)
+    console.dir(erc20Contracts)
+    // const balancesPromises = userAddressList.map(async (userAddress) => {
+    //   const balances = batchCallOneFunction(
+    //     erc20Contracts,
+    //     'balanceOf',
+    //     userAddress
+    //   )
+    //   return balances
+    // )}
+      const userAddressBalancesPromises = userAddressList.map(userAddress => {
+        return batchCallOneFunction(
+          erc20Contracts,
+          'balanceOf',
+          [userAddress]
+        )
+      })
+
+      const userAddressBalances = await Promise.all(userAddressBalancesPromises)
+      console.debug(`getAddressesBalances:`)
+      console.dir(userAddressBalances)
+
+
+      // const addressesBalances = await batchCallOneFunction(
+      //   erc20Contracts,
+      //   'balanceOf',
+      //   // userAddressObjects
+      //   userAddressList
+      // )
+      // console.debug(`getAddressesBalances:`)
+      // console.dir(addressesBalances)
+
+
+      // const addressesBalances = await Promise.all(addressesBalancesPromises)
+      // return addressesBalances
+
+      // Build a consistent array of balances
+      const userAddressBalancesN = userAddressBalances ? userAddressBalances.map((userAddressBalances) => {
+        const userBalances = userAddressBalances? userAddressBalances.map((_balance) => {
+          // const balance = _balance as bigint
+          let balance
+          try {
+            balance = (_balance ? BigInt(_balance.toString()) : BigInt(0))
+          }
+          catch (error) {
+            // console.warn('Failed to get balance', error)
+            balance = BigInt(0)
+          }
+          return balance
+        }) : new Array(erc20Addresses.length).fill(BigInt(0))
+        return userBalances
+      }) : new Array(userAddressList.length).fill(new Array(erc20Addresses.length).fill(BigInt(0)))
+
+      return userAddressBalancesN
+
+          // const balances = batchCallOneFunction(
+    //   erc20Addresses,
+    //   'balanceOf',
+    //   userAddressList
+    // )
 
   //   const balancesPromises = addressList.map(async (address) => {
   //     const balance = await getErc20AbiBalanceOfOnly(
@@ -287,6 +360,7 @@ const getAddressesBalances = async (
   //   })
   //   const balances = await Promise.all(balancesPromises)
   //   return balances
+
   } catch (error) {
     consoleWarnOnError && console.warn('Failed to get balances', error)
   }
@@ -330,8 +404,17 @@ const getAddressesLpBalances = async (
       consoleWarnOnError
     )
 
-    console.debug(`getAddressesLpBalances:`)
+    console.debug(`getAddressesLpBalances: lpAddresses=`)
     console.dir(lpAddresses)
+
+    const addressesBalances = await getAddressesBalances(
+      addressList,
+      lpAddresses,
+      providers,
+      consoleWarnOnError
+    )
+    console.debug(`getAddressesLpBalances: addressesBalances=`)
+    console.dir(addressesBalances)
 
     return totalAmount
   } catch (error) {
