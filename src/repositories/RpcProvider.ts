@@ -7,7 +7,7 @@ import {
 } from 'ethers'
 
 import { ERC20ABI } from 'src/utils/blockchain/abi/ERC20ABI'
-import { REG_ContractAddress } from 'src/utils/blockchain/consts/otherTokens'
+import { CHAIN_ID_ETHEREUM, CHAIN_ID_GNOSIS_XDAI, CHAIN_ID_POLYGON, CHAINS_NAMES, REG_ContractAddress } from 'src/utils/blockchain/consts/otherTokens'
 import { batchCallOneContractOneFunctionMultipleParams } from 'src/utils/blockchain/contract'
 import { wait } from 'src/utils/general'
 import { WaitingQueue } from 'src/utils/waitingQueue'
@@ -21,20 +21,117 @@ declare module 'ethers' {
   }
 }
 
-const GNOSIS_RPC_URLS = [
-  'https://gnosis-rpc.publicnode.com',
-  'https://rpc.ankr.com/gnosis',
-  'https://gnosis.drpc.org',
+/**
+ * Get RPC URLs for a given chain ID from .env variables
+ * @param chainId Chain ID
+ * @returns Array of RPC URLs
+ * @throws Error if the chain ID is not supported
+ */
+const getConfigRpcUrls = (chainId: number): string[] => {
+
+  // console.log('getConfigRpcUrls', { chainId })
+  // console.log('process.env', {
+  //   RPC_URLS_ETH_MAINNET: process.env.RPC_URLS_ETH_MAINNET,
+  //   RPC_URLS_GNOSIS_MAINNET: process.env.RPC_URLS_GNOSIS_MAINNET,
+  // })
+  // console.log('getConfigRpcUrls', { chainId })
+
+  // const getEnvRpcUrls = (envVarName: string || undefined): string[] => {
+  const getEnvRpcUrls = (chainId: number): string[] => {
+    // if (!envVar) {
+    //   return []
+    // }
+    // Split the URLs by comma and remove any empty values
+    // const urls = envVar.split(',').map((url) => url.trim())
+    // const urls = envVar.split(',')
+    // return removeEmptyValuesAndDuplicates(urls)
+
+    // Get the environment variable name and default urls based on the chain ID
+    
+    let envVarName = ''
+    let defaultUrls: string[] = []
+
+    switch (chainId) {
+      case CHAIN_ID_ETHEREUM:
+        envVarName = 'RPC_URLS_ETH_MAINNET'
+        defaultUrls = DEFAULT_ETHEREUM_RPC_URLS
+        break
+      case CHAIN_ID_GNOSIS_XDAI:
+        envVarName = 'RPC_URLS_GNOSIS_MAINNET'
+        defaultUrls = DEFAULT_GNOSIS_RPC_URLS
+        break
+      // TODO: Polygon
+      case CHAIN_ID_POLYGON:
+        envVarName = ''
+        defaultUrls = []
+        break
+      default:
+        throw new Error(`Unsupported chain ID: ${chainId}`)
+    }
+  // console.log('getConfigRpcUrls: process.env', {
+  //   chainId,
+  //   [envVarName]: process.env[envVarName],
+  //   defaultUrls,
+  // })
+    // Get the environment variable value
+    const envVar = process.env[envVarName] ?? ''
+    const envUrls = envVar.split(',')
+    // Add default URLs to the urls array
+    // TODO: enable ->
+    const allUrls = envUrls.concat(defaultUrls)
+    // TODO: remove <-
+    // const allUrls = envUrls
+    // TODO: remove ->
+    // TODO: remove <-
+    // Remove empty values and duplicates
+    // return removeEmptyValuesAndDuplicates(urls)
+    const uniqueUrls = new Set(allUrls)
+    // console.log('getConfigRpcUrls: uniqueUrls', { chainId, uniqueUrls })
+    // Filter out empty values
+    const filteredUrls = Array.from(uniqueUrls).filter((url) => url.trim() !== '')
+    console.log('getConfigRpcUrls: filteredUrls', { chainId, filteredUrls })
+    return filteredUrls
+  }
+  // const removeEmptyValuesAndDuplicates = (urls: string[]) => {
+  //   const uniqueUrls = new Set(urls)
+  //   return Array.from(uniqueUrls).filter((url) => url.trim() !== '')
+  // }
+/* 
+  switch (chainId) {
+    case CHAIN_ID_ETHEREUM:
+      return process.env.RPC_URLS_ETH_MAINNET
+      // sp)lit and remove any empty values
+        // ? process.env.RPC_URLS_ETH_MAINNET.split(',').filter((url) => url.trim() !== '') : DEFAULT_ETHEREUM_RPC_URLS
+        ? getEnvRpcUrls('RPC_URLS_ETH_MAINNET') : DEFAULT_ETHEREUM_RPC_URLS
+    case CHAIN_ID_GNOSIS_XDAI:
+      return process.env.RPC_URLS_GNOSIS_MAINNET
+        // ? process.env.RPC_URLS_GNOSIS_MAINNET.split(',').filter((url) => url.trim() !== '') : DEFAULT_GNOSIS_RPC_URLS
+        ? getEnvRpcUrls('RPC_URLS_GNOSIS_MAINNET') : DEFAULT_GNOSIS_RPC_URLS
+    case CHAIN_ID_POLYGON:
+      return [] // TODO: Add Polygon RPC URLs
+    default:
+      throw new Error(`Unsupported chain ID: ${chainId}`)
+  } */
+  return getEnvRpcUrls(chainId)
+}
+
+const DEFAULT_GNOSIS_RPC_URLS = [
   'https://rpc.gnosischain.com',
   'https://rpc.gnosis.gateway.fm',
+  'https://rpc.ap-southeast-1.gateway.fm/v4/gnosis/non-archival/mainnet',
+  'https://gnosis-rpc.publicnode.com',
+  'https://gnosis.oat.farm',
+  'https://0xrpc.io/gno',
 ]
 
-const ETHEREUM_RPC_URLS = [
-  'https://eth.llamarpc.com',
+const DEFAULT_ETHEREUM_RPC_URLS = [
+  'https://rpc.eth.gateway.fm',
+  'https://ethereum-rpc.publicnode.com',
+  'https://eth-mainnet.public.blastapi.io',
+  'https://ethereum.blockpi.network/v1/rpc/public',
+  'https://rpc.mevblocker.io/fast',
   'https://rpc.mevblocker.io',
-  'https://eth.merkle.ioz',
-  'https://rpc.ankr.com/eth',
-  'https://eth-pokt.nodies.app',
+  'https://0xrpc.io/eth',
 ]
 
 /**
@@ -125,10 +222,12 @@ async function testRpcThresholds(
   return threshold
 }
 
-async function getWorkingRpc(urls: string[]): Promise<JsonRpcProvider> {
+// async function getWorkingRpc(urls: string[]): Promise<JsonRpcProvider> {
+async function getWorkingRpc(chainId: number): Promise<JsonRpcProvider> {
   let rpcConnectOk = false
   let rpcThresholdValue = 0
   let failedRpcErrorCount = 0
+  const urls = getConfigRpcUrls(chainId)
   for (const url of urls) {
     try {
       rpcConnectOk = false
@@ -159,6 +258,11 @@ async function getWorkingRpc(urls: string[]): Promise<JsonRpcProvider> {
           `Successfully connected to ${url} after ${failedRpcErrorCount} failed attempts`,
         )
       }
+      // todo: remove (debug)
+      // else {
+      //   console.info(`Successfully connected to ${url}`)
+      // }
+
       return provider
     } catch (error) {
       failedRpcErrorCount++
@@ -177,7 +281,11 @@ async function getWorkingRpc(urls: string[]): Promise<JsonRpcProvider> {
       }
     }
   }
-  throw new Error(`All RPC URLs (${urls?.length}) failed`)
+  console.error(
+    `All RPC URLs (${urls?.length}) failed to connect or test rpcThresholdValue`,
+    urls,
+  )
+  throw new Error(`All RPC URLs (${urls?.length}) failed for ${CHAINS_NAMES[chainId]} (chainId ${chainId})`)
 }
 
 interface Providers {
@@ -194,9 +302,17 @@ export const initializeProviders = async () => {
   }
   initializeProvidersQueue = new WaitingQueue()
 
+  // console.info('Initializing RPC providers...')
+  // console.log('RPC URLs:', {
+  //   GnosisRpcUrls: getConfigRpcUrls(CHAIN_ID_GNOSIS_XDAI),
+  //   EthereumRpcUrls: getConfigRpcUrls(CHAIN_ID_ETHEREUM),
+  // })
+
   const [GnosisRpcProvider, EthereumRpcProvider] = await Promise.all([
-    getWorkingRpc(GNOSIS_RPC_URLS),
-    getWorkingRpc(ETHEREUM_RPC_URLS),
+    // getWorkingRpc(GNOSIS_RPC_URLS),
+    // getWorkingRpc(ETHEREUM_RPC_URLS),
+    getWorkingRpc(CHAIN_ID_GNOSIS_XDAI),
+    getWorkingRpc(CHAIN_ID_ETHEREUM),
   ])
 
   providers = { GnosisRpcProvider, EthereumRpcProvider }

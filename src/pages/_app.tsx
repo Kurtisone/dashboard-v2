@@ -11,7 +11,7 @@ import '@mantine/core/styles.css'
 import '@mantine/dates/styles.css'
 import '@mantine/notifications/styles.css'
 import {
-  CHAINS,
+  CHAINS as RealtCommonsDefaultChains,
   ChainSelectConfig,
   ChainsID,
   ConnectorsAvailable,
@@ -55,16 +55,20 @@ type AppProps = NextAppProps & {
     THEGRAPH_API_KEY: string
     MATOMO_URL: string
     MATOMO_SITE_ID: string
+    RPC_URLS_ETH_MAINNET: string
+    RPC_URLS_GNOSIS_MAINNET: string
   }
 }
 
 const queryClient = new QueryClient({})
 
+// const CHAINS = // RealtCommonsDefaultChains
+const CHAINS = RealtCommonsDefaultChains
+
 const dashbordChains: ChainSelectConfig<RealtChains> = {
   allowedChains: parseAllowedChain(ChainsID),
   chainsConfig: CHAINS,
-  // Explicitly setting Gnosis as the defaultChainId to ensure compatibility with read-only addresses.
-  defaultChainId: ChainsID.Gnosis,
+  defaultChainId: ChainsID.Gnosis, // Explicitly setting Gnosis as the defaultChainId
 }
 
 const env = process.env.NEXT_PUBLIC_ENV ?? 'development'
@@ -89,6 +93,8 @@ export const getServerSideProps = async () => ({
     THEGRAPH_API_KEY: process.env.THEGRAPH_API_KEY,
     MATOMO_URL: process.env.MATOMO_URL,
     MATOMO_SITE_ID: process.env.MATOMO_SITE_ID,
+    RPC_URLS_ETH_MAINNET: process.env.RPC_URLS_ETH_MAINNET,
+    RPC_URLS_GNOSIS_MAINNET: process.env.RPC_URLS_GNOSIS_MAINNET,
   },
 })
 
@@ -153,6 +159,8 @@ App.getInitialProps = ({ ctx }: { ctx: GetServerSidePropsContext }) => {
       THEGRAPH_API_KEY: process.env.THEGRAPH_API_KEY,
       MATOMO_URL: process.env.MATOMO_URL,
       MATOMO_SITE_ID: process.env.MATOMO_SITE_ID,
+      RPC_URLS_ETH_MAINNET: process.env.RPC_URLS_ETH_MAINNET,
+      RPC_URLS_GNOSIS_MAINNET: process.env.RPC_URLS_GNOSIS_MAINNET,
     },
     colorScheme: getCookie('mantine-color-scheme', ctx) || 'dark',
     locale: getCookie('react-i18next', ctx) || 'fr',

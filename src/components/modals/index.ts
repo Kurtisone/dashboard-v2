@@ -7,7 +7,8 @@ import { AssetsViewFilterModal } from '../assetsView/filters/AssetsViewFilterMod
 import { ManageWalletModal } from './ManageWalletModal'
 
 export const modals = {
-  web3Wallets: WalletModal as FC<ContextModalProps<Record<string, unknown>>>,
+  // web3Wallets: WalletModal as FC<ContextModalProps<Record<string, unknown>>>,
+  web3Wallets: WalletModal as FC<ContextModalProps>,
   assetsViewFilterModal: AssetsViewFilterModal,
   manageWalletModal: ManageWalletModal,
 }
