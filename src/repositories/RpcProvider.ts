@@ -47,7 +47,6 @@ const getConfigRpcUrls = (chainId: number): string[] => {
     // return removeEmptyValuesAndDuplicates(urls)
 
     // Get the environment variable name and default urls based on the chain ID
-    
     let envVarName = ''
     let defaultUrls: string[] = []
 
@@ -73,6 +72,7 @@ const getConfigRpcUrls = (chainId: number): string[] => {
   //   [envVarName]: process.env[envVarName],
   //   defaultUrls,
   // })
+  /*
     // Get the environment variable value
     const envVar = process.env[envVarName] ?? ''
     const envUrls = envVar.split(',')
@@ -89,8 +89,14 @@ const getConfigRpcUrls = (chainId: number): string[] => {
     // console.log('getConfigRpcUrls: uniqueUrls', { chainId, uniqueUrls })
     // Filter out empty values
     const filteredUrls = Array.from(uniqueUrls).filter((url) => url.trim() !== '')
-    console.log('getConfigRpcUrls: filteredUrls', { chainId, filteredUrls })
+    // console.log('getConfigRpcUrls: filteredUrls', { chainId, filteredUrls })
     return filteredUrls
+*/
+    // Get the environment variable value, split by comma, add default URLs, remove duplicates and empty values
+    // const filteredUrls = Array.from(new Set((process.env[envVarName] ?? '').split(',').concat(defaultUrls))).filter((url) => url.trim() !== '')
+    // console.log('getConfigRpcUrls: filteredUrls', { chainId, filteredUrls })
+    // return filteredUrls
+    return Array.from(new Set((process.env[envVarName] ?? '').split(',').concat(defaultUrls))).filter((url) => url.trim() !== '')
   }
   // const removeEmptyValuesAndDuplicates = (urls: string[]) => {
   //   const uniqueUrls = new Set(urls)
