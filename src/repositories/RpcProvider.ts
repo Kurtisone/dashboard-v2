@@ -21,104 +21,38 @@ declare module 'ethers' {
   }
 }
 
+console.debug('RpcProvider.ts: Initializing RPC provider utilities')
+
 /**
  * Get RPC URLs for a given chain ID from .env variables
  * @param chainId Chain ID
  * @returns Array of RPC URLs
  * @throws Error if the chain ID is not supported
  */
-const getConfigRpcUrls = (chainId: number): string[] => {
+const getRpcUrls = (chainId: number): string[] => {
+  // Get the environment variable name and default urls based on the chain ID
+  let envVarName = ''
+  let defaultUrls: string[] = []
 
-  // console.log('getConfigRpcUrls', { chainId })
-  // console.log('process.env', {
-  //   RPC_URLS_ETH_MAINNET: process.env.RPC_URLS_ETH_MAINNET,
-  //   RPC_URLS_GNOSIS_MAINNET: process.env.RPC_URLS_GNOSIS_MAINNET,
-  // })
-  // console.log('getConfigRpcUrls', { chainId })
-
-  // const getEnvRpcUrls = (envVarName: string || undefined): string[] => {
-  const getEnvRpcUrls = (chainId: number): string[] => {
-    // if (!envVar) {
-    //   return []
-    // }
-    // Split the URLs by comma and remove any empty values
-    // const urls = envVar.split(',').map((url) => url.trim())
-    // const urls = envVar.split(',')
-    // return removeEmptyValuesAndDuplicates(urls)
-
-    // Get the environment variable name and default urls based on the chain ID
-    let envVarName = ''
-    let defaultUrls: string[] = []
-
-    switch (chainId) {
-      case CHAIN_ID_ETHEREUM:
-        envVarName = 'RPC_URLS_ETH_MAINNET'
-        defaultUrls = DEFAULT_ETHEREUM_RPC_URLS
-        break
-      case CHAIN_ID_GNOSIS_XDAI:
-        envVarName = 'RPC_URLS_GNOSIS_MAINNET'
-        defaultUrls = DEFAULT_GNOSIS_RPC_URLS
-        break
-      // TODO: Polygon
-      case CHAIN_ID_POLYGON:
-        envVarName = ''
-        defaultUrls = []
-        break
-      default:
-        throw new Error(`Unsupported chain ID: ${chainId}`)
-    }
-  // console.log('getConfigRpcUrls: process.env', {
-  //   chainId,
-  //   [envVarName]: process.env[envVarName],
-  //   defaultUrls,
-  // })
-  /*
-    // Get the environment variable value
-    const envVar = process.env[envVarName] ?? ''
-    const envUrls = envVar.split(',')
-    // Add default URLs to the urls array
-    // TODO: enable ->
-    const allUrls = envUrls.concat(defaultUrls)
-    // TODO: remove <-
-    // const allUrls = envUrls
-    // TODO: remove ->
-    // TODO: remove <-
-    // Remove empty values and duplicates
-    // return removeEmptyValuesAndDuplicates(urls)
-    const uniqueUrls = new Set(allUrls)
-    // console.log('getConfigRpcUrls: uniqueUrls', { chainId, uniqueUrls })
-    // Filter out empty values
-    const filteredUrls = Array.from(uniqueUrls).filter((url) => url.trim() !== '')
-    // console.log('getConfigRpcUrls: filteredUrls', { chainId, filteredUrls })
-    return filteredUrls
-*/
-    // Get the environment variable value, split by comma, add default URLs, remove duplicates and empty values
-    // const filteredUrls = Array.from(new Set((process.env[envVarName] ?? '').split(',').concat(defaultUrls))).filter((url) => url.trim() !== '')
-    // console.log('getConfigRpcUrls: filteredUrls', { chainId, filteredUrls })
-    // return filteredUrls
-    return Array.from(new Set((process.env[envVarName] ?? '').split(',').concat(defaultUrls))).filter((url) => url.trim() !== '')
-  }
-  // const removeEmptyValuesAndDuplicates = (urls: string[]) => {
-  //   const uniqueUrls = new Set(urls)
-  //   return Array.from(uniqueUrls).filter((url) => url.trim() !== '')
-  // }
-/* 
   switch (chainId) {
     case CHAIN_ID_ETHEREUM:
-      return process.env.RPC_URLS_ETH_MAINNET
-      // sp)lit and remove any empty values
-        // ? process.env.RPC_URLS_ETH_MAINNET.split(',').filter((url) => url.trim() !== '') : DEFAULT_ETHEREUM_RPC_URLS
-        ? getEnvRpcUrls('RPC_URLS_ETH_MAINNET') : DEFAULT_ETHEREUM_RPC_URLS
+      envVarName = 'RPC_URLS_ETH_MAINNET'
+      defaultUrls = DEFAULT_ETHEREUM_RPC_URLS
+      break
     case CHAIN_ID_GNOSIS_XDAI:
-      return process.env.RPC_URLS_GNOSIS_MAINNET
-        // ? process.env.RPC_URLS_GNOSIS_MAINNET.split(',').filter((url) => url.trim() !== '') : DEFAULT_GNOSIS_RPC_URLS
-        ? getEnvRpcUrls('RPC_URLS_GNOSIS_MAINNET') : DEFAULT_GNOSIS_RPC_URLS
+      envVarName = 'RPC_URLS_GNOSIS_MAINNET'
+      defaultUrls = DEFAULT_GNOSIS_RPC_URLS
+      break
+    // TODO: Polygon
     case CHAIN_ID_POLYGON:
-      return [] // TODO: Add Polygon RPC URLs
+      envVarName = ''
+      defaultUrls = []
+      break
     default:
       throw new Error(`Unsupported chain ID: ${chainId}`)
-  } */
-  return getEnvRpcUrls(chainId)
+  }
+  // Get the environment variable value, split by comma, add default URLs, remove duplicates and empty values
+  return Array.from(new Set((process.env[envVarName] ?? '').split(',').concat(defaultUrls))).filter((url) => url.trim() !== '')
 }
 
 const DEFAULT_GNOSIS_RPC_URLS = [
@@ -227,13 +161,12 @@ async function testRpcThresholds(
   }
   return threshold
 }
-
-// async function getWorkingRpc(urls: string[]): Promise<JsonRpcProvider> {
-async function getWorkingRpc(chainId: number): Promise<JsonRpcProvider> {
+/*
+export async function getWorkingRpcUrl(chainId: number, checkRpcThresholds = true): Promise<string> {
   let rpcConnectOk = false
   let rpcThresholdValue = 0
   let failedRpcErrorCount = 0
-  const urls = getConfigRpcUrls(chainId)
+  const urls = getRpcUrls(chainId)
   for (const url of urls) {
     try {
       rpcConnectOk = false
@@ -243,8 +176,9 @@ async function getWorkingRpc(chainId: number): Promise<JsonRpcProvider> {
       const currentBlockNumber = provider.getBlockNumber()
       await Promise.all([network, currentBlockNumber])
       rpcConnectOk = true
-      // Test for the maximum number of concurrent requests the provider can handle
-      rpcThresholdValue = await testRpcThresholds(
+      rpcThresholdValue = ! checkRpcThresholds ? 1 :
+        // Test for the maximum number of concurrent requests the provider can handle
+        await testRpcThresholds(
         provider,
         REG_ContractAddress,
         5,
@@ -264,12 +198,84 @@ async function getWorkingRpc(chainId: number): Promise<JsonRpcProvider> {
           `Successfully connected to ${url} after ${failedRpcErrorCount} failed attempts`,
         )
       }
-      // todo: remove (debug)
-      // else {
-      //   console.info(`Successfully connected to ${url}`)
-      // }
+      return url
+    } catch (error) {
+      failedRpcErrorCount++
+      if (!rpcConnectOk) {
+        // Connection error
+        console.error(`Failed to connect to ${url}, trying next one...`, error)
+      } else if (rpcThresholdValue < 1) {
+        // Threshold error
+        console.error(
+          `Successfull connection to ${url} BUT failed to test rpcThresholdValue, trying next one...`,
+          error,
+        )
+      } else {
+        // General error
+        console.error(`Failed to connect to ${url}, trying next one...`, error)
+      }
+    }
+  }
+  console.error(
+    `All RPC URLs (${urls?.length}) failed to connect or test rpcThresholdValue`,
+    urls,
+  )
+  throw new Error(`All RPC URLs (${urls?.length}) failed for ${CHAINS_NAMES[chainId]} (chainId ${chainId})`)
+}
+*/
 
-      return provider
+/**
+ * 
+ * @param chainId Chain ID
+ * @description Get a working RPC provider for a given chain ID, returns both the provider and the URL
+ * * This function tries to connect to each RPC URL for the given chain ID
+ * * If the connection is successful, it tests the provider for the maximum number of concurrent requests it can handle
+ * * If the provider is able to handle the required number of concurrent requests, it returns the provider and the URL
+ * * If the provider is not able to handle the required number of concurrent requests, it skips it and tries the next one
+ * * If all RPC URLs fail to connect or test the provider, it throws an error
+ * @throws Error if all RPC URLs fail to connect or test the provider
+ * @throws Error if the chain ID is not supported
+ * @param chainId Chain ID
+ * @param checkRpcThresholds 
+ * @returns 
+ */
+async function getWorkingRpc(chainId: number, checkRpcThresholds = true): Promise<{provider: JsonRpcProvider, url: string}> {
+  let rpcConnectOk = false
+  let rpcThresholdValue = 0
+  let failedRpcErrorCount = 0
+  const urls = getRpcUrls(chainId)
+  for (const url of urls) {
+    try {
+      rpcConnectOk = false
+      rpcThresholdValue = 0
+      const provider = new JsonRpcProvider(url)
+      const network = provider.getNetwork()
+      const currentBlockNumber = provider.getBlockNumber()
+      await Promise.all([network, currentBlockNumber])
+      rpcConnectOk = true
+      rpcThresholdValue = ! checkRpcThresholds ? 1 :
+        // Test for the maximum number of concurrent requests the provider can handle
+        await testRpcThresholds(
+        provider,
+        REG_ContractAddress,
+        5,
+        5,
+        5,
+        150,
+      )
+      if (rpcThresholdValue < 1) {
+        // Throw error if the threshold is 0
+        // Means the provider is not able to handle required concurrent requests number
+        // skip it and try next one
+        throw new Error('rpcThresholdValue returned 0')
+      }
+      // If any error has occurred before, log the successful connection
+      if (failedRpcErrorCount > 0) {
+        console.info(
+          `Successfully connected to ${url} after ${failedRpcErrorCount} failed attempts`,
+        )
+      }
+      return {provider, url}
     } catch (error) {
       failedRpcErrorCount++
       if (!rpcConnectOk) {
@@ -294,34 +300,107 @@ async function getWorkingRpc(chainId: number): Promise<JsonRpcProvider> {
   throw new Error(`All RPC URLs (${urls?.length}) failed for ${CHAINS_NAMES[chainId]} (chainId ${chainId})`)
 }
 
+/*
+async function getWorkingRpc(chainId: number, checkRpcThresholds = true): Promise<JsonRpcProvider> {
+  let rpcConnectOk = false
+  let rpcThresholdValue = 0
+  let failedRpcErrorCount = 0
+  const urls = getRpcUrls(chainId)
+  for (const url of urls) {
+    try {
+      rpcConnectOk = false
+      rpcThresholdValue = 0
+      const provider = new JsonRpcProvider(url)
+      const network = provider.getNetwork()
+      const currentBlockNumber = provider.getBlockNumber()
+      await Promise.all([network, currentBlockNumber])
+      rpcConnectOk = true
+      rpcThresholdValue = ! checkRpcThresholds ? 1 :
+        // Test for the maximum number of concurrent requests the provider can handle
+        await testRpcThresholds(
+        provider,
+        REG_ContractAddress,
+        5,
+        5,
+        5,
+        150,
+      )
+      if (rpcThresholdValue < 1) {
+        // Throw error if the threshold is 0
+        // Means the provider is not able to handle required concurrent requests number
+        // skip it and try next one
+        throw new Error('rpcThresholdValue returned 0')
+      }
+      // If any error has occurred before, log the successful connection
+      if (failedRpcErrorCount > 0) {
+        console.info(
+          `Successfully connected to ${url} after ${failedRpcErrorCount} failed attempts`,
+        )
+      }
+      return provider
+    } catch (error) {
+      failedRpcErrorCount++
+      if (!rpcConnectOk) {
+        // Connection error
+        console.error(`Failed to connect to ${url}, trying next one...`, error)
+      } else if (rpcThresholdValue < 1) {
+        // Threshold error
+        console.error(
+          `Successfull connection to ${url} BUT failed to test rpcThresholdValue, trying next one...`,
+          error,
+        )
+      } else {
+        // General error
+        console.error(`Failed to connect to ${url}, trying next one...`, error)
+      }
+    }
+  }
+  console.error(
+    `All RPC URLs (${urls?.length}) failed to connect or test rpcThresholdValue`,
+    urls,
+  )
+  throw new Error(`All RPC URLs (${urls?.length}) failed for ${CHAINS_NAMES[chainId]} (chainId ${chainId})`)
+}
+*/
+
 interface Providers {
   GnosisRpcProvider: JsonRpcProvider
   EthereumRpcProvider: JsonRpcProvider
+  // PolygonRpcProvider?: JsonRpcProvider // TODO: add Polygon provider
 }
 
-let initializeProvidersQueue: WaitingQueue<Providers> | null = null
-let providers: Providers | undefined = undefined
+interface ProvidersWithUrls extends Providers {
+  GnosisRpcUrl: string
+  EthereumRpcUrl: string
+  // PolygonRpcUrl?: string // TODO: add Polygon provider
+}
+
+
+let initializeProvidersQueue: WaitingQueue<ProvidersWithUrls> | null = null
+// let providers: Providers | undefined = undefined
+let providers: ProvidersWithUrls | undefined = undefined
 
 export const initializeProviders = async () => {
   if (initializeProvidersQueue) {
     return initializeProvidersQueue.wait()
   }
   initializeProvidersQueue = new WaitingQueue()
-
-  // console.info('Initializing RPC providers...')
-  // console.log('RPC URLs:', {
-  //   GnosisRpcUrls: getConfigRpcUrls(CHAIN_ID_GNOSIS_XDAI),
-  //   EthereumRpcUrls: getConfigRpcUrls(CHAIN_ID_ETHEREUM),
-  // })
-
-  const [GnosisRpcProvider, EthereumRpcProvider] = await Promise.all([
-    // getWorkingRpc(GNOSIS_RPC_URLS),
-    // getWorkingRpc(ETHEREUM_RPC_URLS),
+  // const [GnosisRpcProvider, EthereumRpcProvider] = await Promise.all([
+  //   getWorkingRpc(CHAIN_ID_GNOSIS_XDAI),
+  //   getWorkingRpc(CHAIN_ID_ETHEREUM),
+  // ])
+const [GnosisRpcProviderWithUrl, EthereumRpcProviderWithUrl] = await Promise.all([
     getWorkingRpc(CHAIN_ID_GNOSIS_XDAI),
     getWorkingRpc(CHAIN_ID_ETHEREUM),
   ])
-
-  providers = { GnosisRpcProvider, EthereumRpcProvider }
+  providers = { 
+    GnosisRpcProvider: GnosisRpcProviderWithUrl.provider,
+    EthereumRpcProvider: EthereumRpcProviderWithUrl.provider,
+    GnosisRpcUrl: GnosisRpcProviderWithUrl.url,
+    EthereumRpcUrl: EthereumRpcProviderWithUrl.url,
+    // PolygonRpcProvider: undefined, // TODO: add Polygon provider
+    // PolygonRpcUrl: undefined, // TODO: add Polygon provider
+  }
   initializeProvidersQueue.resolve(providers)
   return providers
 }

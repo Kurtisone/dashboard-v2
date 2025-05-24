@@ -11,7 +11,7 @@ import '@mantine/core/styles.css'
 import '@mantine/dates/styles.css'
 import '@mantine/notifications/styles.css'
 import {
-  CHAINS as RealtCommonsDefaultChains,
+  CHAINS as RealtCommonsDefaultChainsConfig,
   ChainSelectConfig,
   ChainsID,
   ConnectorsAvailable,
@@ -25,6 +25,7 @@ import {
   metaMask,
   metaMaskHooks,
   parseAllowedChain,
+  ChainsConfig,
 } from '@realtoken/realt-commons'
 import { init as initMatomoNext } from '@socialgouv/matomo-next'
 
@@ -38,6 +39,7 @@ import { resources } from 'src/i18next'
 import { MantineProviders } from 'src/providers'
 import InitStoreProvider from 'src/providers/InitStoreProvider'
 import store from 'src/store/store'
+import { initializeProviders } from 'src/repositories/RpcProvider'
 
 // Matomo property added to window object
 declare global {
@@ -62,13 +64,51 @@ type AppProps = NextAppProps & {
 
 const queryClient = new QueryClient({})
 
-// const CHAINS = // RealtCommonsDefaultChains
-const CHAINS = RealtCommonsDefaultChains
+/*
+// Initialize with empty strings; will be set asynchronously
+let GnosisRpcUrl = ''
+let EthereumRpcUrl = ''
+
+// Get RPC URLs
+// No top-level await in this file, so we use a promise to get the URLs
+initializeProviders().then((providers) => {
+  GnosisRpcUrl = providers.GnosisRpcUrl
+  EthereumRpcUrl = providers.EthereumRpcUrl
+})
+
+const CustomChainsConfig = RealtCommonsDefaultChainsConfig
+
+const chainGnosis = RealtCommonsDefaultChainsConfig[ChainsID.Gnosis]
+const chainEthereum = RealtCommonsDefaultChainsConfig[ChainsID.Ethereum]
+// TODO: add Polygon
+
+// Update RealtCommons Rpc Urls for Gnosis and Ethereum chains with custom rpc
+if (GnosisRpcUrl) {
+  chainGnosis.rpcUrl = GnosisRpcUrl
+}
+if (EthereumRpcUrl) {
+  chainEthereum.rpcUrl = EthereumRpcUrl
+}
+// TODO: add Polygon
+
+console.log('CustomChainsConfig', CustomChainsConfig)
+console.log('GnosisRpcUrl', GnosisRpcUrl)
+console.log('EthereumRpcUrl', EthereumRpcUrl)
+*/
+
+const CustomChainsConfig = RealtCommonsDefaultChainsConfig
 
 const dashbordChains: ChainSelectConfig<RealtChains> = {
   allowedChains: parseAllowedChain(ChainsID),
-  chainsConfig: CHAINS,
-  defaultChainId: ChainsID.Gnosis, // Explicitly setting Gnosis as the defaultChainId
+  chainsConfig: CustomChainsConfig,
+  // defaultChainId: ChainsID.Gnosis, // Explicitly setting Gnosis as the defaultChainId
+  // defaultChainId: ChainsID.Gnosis, // Explicitly setting Gnosis as the defaultChainId
+  // defaultChainId: ChainsID.Gnosis, // Explicitly setting Gnosis as the defaultChainId
+  // defaultChainId: ChainsID.Gnosis, // Explicitly setting Gnosis as the defaultChainId
+  // defaultChainId: ChainsID.Gnosis, // Explicitly setting Gnosis as the defaultChainId
+  // defaultChainId: ChainsID.Gnosis, // Explicitly setting Gnosis as the defaultChainId
+  // defaultChainId: ChainsID.Gnosis, // Explicitly setting Gnosis as the defaultChainId
+  // defaultChainId: ChainsID.Gnosis, // Explicitly setting Gnosis as the defaultChainId
 }
 
 const env = process.env.NEXT_PUBLIC_ENV ?? 'development'
