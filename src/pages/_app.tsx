@@ -11,12 +11,12 @@ import '@mantine/core/styles.css'
 import '@mantine/dates/styles.css'
 import '@mantine/notifications/styles.css'
 import {
-  CHAINS as RealtCommonsDefaultChainsConfig,
   ChainSelectConfig,
   ChainsID,
   ConnectorsAvailable,
   LanguageInit,
   Chain as RealtChains,
+  CHAINS as RealtCommonsDefaultChainsConfig,
   Web3Providers,
   getConnectors,
   getReadOnlyConnector,
@@ -37,8 +37,8 @@ import 'src/i18next'
 import { resources } from 'src/i18next'
 import { MantineProviders } from 'src/providers'
 import InitStoreProvider from 'src/providers/InitStoreProvider'
-import store from 'src/store/store'
 import { initializeProviders } from 'src/repositories/RpcProvider'
+import store from 'src/store/store'
 
 // Matomo property added to window object
 declare global {
@@ -116,22 +116,24 @@ const App = ({
 
   // Customize chains config for Gnosis and Ethereum
   // using rpc urls from the environment variables
-  const CustomChainsConfig =
-    {
-      // Keep Goerli as testnet else an error will arise at init
-      [ChainsID.Goerli]: RealtCommonsDefaultChainsConfig[ChainsID.Goerli],
-      [ChainsID.Gnosis]: {
-        ...RealtCommonsDefaultChainsConfig[ChainsID.Gnosis],
-        // Use the values from props
-        rpcUrl: GnosisRpcUrl || RealtCommonsDefaultChainsConfig[ChainsID.Gnosis].rpcUrl,
-      },
-      [ChainsID.Ethereum]: {
-        ...RealtCommonsDefaultChainsConfig[ChainsID.Ethereum],
-        // Use the values from props
-        rpcUrl: EthereumRpcUrl || RealtCommonsDefaultChainsConfig[ChainsID.Ethereum].rpcUrl,
-      },
-      // TODO: add Polygon
-     }
+  const CustomChainsConfig = {
+    // Keep Goerli as testnet else an error will arise at init
+    [ChainsID.Goerli]: RealtCommonsDefaultChainsConfig[ChainsID.Goerli],
+    [ChainsID.Gnosis]: {
+      ...RealtCommonsDefaultChainsConfig[ChainsID.Gnosis],
+      // Use the values from props
+      rpcUrl:
+        GnosisRpcUrl || RealtCommonsDefaultChainsConfig[ChainsID.Gnosis].rpcUrl,
+    },
+    [ChainsID.Ethereum]: {
+      ...RealtCommonsDefaultChainsConfig[ChainsID.Ethereum],
+      // Use the values from props
+      rpcUrl:
+        EthereumRpcUrl ||
+        RealtCommonsDefaultChainsConfig[ChainsID.Ethereum].rpcUrl,
+    },
+    // TODO: add Polygon
+  }
 
   const dashbordChains: ChainSelectConfig<RealtChains> = {
     allowedChains: parseAllowedChain(ChainsID),
@@ -184,7 +186,6 @@ const App = ({
 }
 
 App.getInitialProps = async ({ ctx }: { ctx: GetServerSidePropsContext }) => {
-
   // Call initializeProviders to get custom RPC URLs
   const providers = await initializeProviders()
 

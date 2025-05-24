@@ -7,7 +7,13 @@ import {
 } from 'ethers'
 
 import { ERC20ABI } from 'src/utils/blockchain/abi/ERC20ABI'
-import { CHAIN_ID_ETHEREUM, CHAIN_ID_GNOSIS_XDAI, CHAIN_ID_POLYGON, CHAINS_NAMES, REG_ContractAddress } from 'src/utils/blockchain/consts/otherTokens'
+import {
+  CHAINS_NAMES,
+  CHAIN_ID_ETHEREUM,
+  CHAIN_ID_GNOSIS_XDAI,
+  CHAIN_ID_POLYGON,
+  REG_ContractAddress,
+} from 'src/utils/blockchain/consts/otherTokens'
 import { batchCallOneContractOneFunctionMultipleParams } from 'src/utils/blockchain/contract'
 import { wait } from 'src/utils/general'
 import { WaitingQueue } from 'src/utils/waitingQueue'
@@ -50,7 +56,9 @@ const getRpcUrls = (chainId: number): string[] => {
       throw new Error(`Unsupported chain ID: ${chainId}`)
   }
   // Get the environment variable value, split by comma, add default URLs, remove duplicates and empty values
-  return Array.from(new Set((process.env[envVarName] ?? '').split(',').concat(defaultUrls))).filter((url) => url.trim() !== '')
+  return Array.from(
+    new Set((process.env[envVarName] ?? '').split(',').concat(defaultUrls)),
+  ).filter((url) => url.trim() !== '')
 }
 
 const DEFAULT_GNOSIS_RPC_URLS = [
@@ -161,7 +169,7 @@ async function testRpcThresholds(
 }
 
 /**
- * 
+ *
  * @param chainId Chain ID
  * @description Get a working RPC provider for a given chain ID, returns both the provider and the URL
  * * This function tries to connect to each RPC URL for the given chain ID
@@ -172,10 +180,13 @@ async function testRpcThresholds(
  * @throws Error if all RPC URLs fail to connect or test the provider
  * @throws Error if the chain ID is not supported
  * @param chainId Chain ID
- * @param checkRpcThresholds 
- * @returns 
+ * @param checkRpcThresholds
+ * @returns
  */
-async function getWorkingRpc(chainId: number, checkRpcThresholds = true): Promise<{provider: JsonRpcProvider, url: string}> {
+async function getWorkingRpc(
+  chainId: number,
+  checkRpcThresholds = true,
+): Promise<{ provider: JsonRpcProvider; url: string }> {
   let rpcConnectOk = false
   let rpcThresholdValue = 0
   let failedRpcErrorCount = 0
@@ -189,16 +200,10 @@ async function getWorkingRpc(chainId: number, checkRpcThresholds = true): Promis
       const currentBlockNumber = provider.getBlockNumber()
       await Promise.all([network, currentBlockNumber])
       rpcConnectOk = true
-      rpcThresholdValue = ! checkRpcThresholds ? 1 :
-        // Test for the maximum number of concurrent requests the provider can handle
-        await testRpcThresholds(
-        provider,
-        REG_ContractAddress,
-        5,
-        5,
-        5,
-        150,
-      )
+      rpcThresholdValue = !checkRpcThresholds
+        ? 1
+        : // Test for the maximum number of concurrent requests the provider can handle
+          await testRpcThresholds(provider, REG_ContractAddress, 5, 5, 5, 150)
       if (rpcThresholdValue < 1) {
         // Throw error if the threshold is 0
         // Means the provider is not able to handle required concurrent requests number
@@ -211,7 +216,7 @@ async function getWorkingRpc(chainId: number, checkRpcThresholds = true): Promis
           `Successfully connected to ${url} after ${failedRpcErrorCount} failed attempts`,
         )
       }
-      return {provider, url}
+      return { provider, url }
     } catch (error) {
       failedRpcErrorCount++
       if (!rpcConnectOk) {
@@ -233,7 +238,9 @@ async function getWorkingRpc(chainId: number, checkRpcThresholds = true): Promis
     `All RPC URLs (${urls?.length}) failed to connect or test rpcThresholdValue`,
     urls,
   )
-  throw new Error(`All RPC URLs (${urls?.length}) failed for ${CHAINS_NAMES[chainId]} (chainId ${chainId})`)
+  throw new Error(
+    `All RPC URLs (${urls?.length}) failed for ${CHAINS_NAMES[chainId]} (chainId ${chainId})`,
+  )
 }
 
 interface Providers {
@@ -248,7 +255,6 @@ interface ProvidersWithUrls extends Providers {
   // PolygonRpcUrl?: string // TODO: add Polygon provider
 }
 
-
 let initializeProvidersQueue: WaitingQueue<ProvidersWithUrls> | null = null
 let providers: ProvidersWithUrls | undefined = undefined
 
@@ -257,12 +263,13 @@ export const initializeProviders = async () => {
     return initializeProvidersQueue.wait()
   }
   initializeProvidersQueue = new WaitingQueue()
-  
-  const [GnosisRpcProviderWithUrl, EthereumRpcProviderWithUrl] = await Promise.all([
+
+  const [GnosisRpcProviderWithUrl, EthereumRpcProviderWithUrl] =
+    await Promise.all([
       getWorkingRpc(CHAIN_ID_GNOSIS_XDAI),
       getWorkingRpc(CHAIN_ID_ETHEREUM),
     ])
-  providers = { 
+  providers = {
     GnosisRpcProvider: GnosisRpcProviderWithUrl.provider,
     EthereumRpcProvider: EthereumRpcProviderWithUrl.provider,
     GnosisRpcUrl: GnosisRpcProviderWithUrl.url,
