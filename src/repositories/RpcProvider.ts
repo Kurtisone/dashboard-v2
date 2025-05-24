@@ -21,8 +21,6 @@ declare module 'ethers' {
   }
 }
 
-console.debug('RpcProvider.ts: Initializing RPC provider utilities')
-
 /**
  * Get RPC URLs for a given chain ID from .env variables
  * @param chainId Chain ID
@@ -161,68 +159,6 @@ async function testRpcThresholds(
   }
   return threshold
 }
-/*
-export async function getWorkingRpcUrl(chainId: number, checkRpcThresholds = true): Promise<string> {
-  let rpcConnectOk = false
-  let rpcThresholdValue = 0
-  let failedRpcErrorCount = 0
-  const urls = getRpcUrls(chainId)
-  for (const url of urls) {
-    try {
-      rpcConnectOk = false
-      rpcThresholdValue = 0
-      const provider = new JsonRpcProvider(url)
-      const network = provider.getNetwork()
-      const currentBlockNumber = provider.getBlockNumber()
-      await Promise.all([network, currentBlockNumber])
-      rpcConnectOk = true
-      rpcThresholdValue = ! checkRpcThresholds ? 1 :
-        // Test for the maximum number of concurrent requests the provider can handle
-        await testRpcThresholds(
-        provider,
-        REG_ContractAddress,
-        5,
-        5,
-        5,
-        150,
-      )
-      if (rpcThresholdValue < 1) {
-        // Throw error if the threshold is 0
-        // Means the provider is not able to handle required concurrent requests number
-        // skip it and try next one
-        throw new Error('rpcThresholdValue returned 0')
-      }
-      // If any error has occurred before, log the successful connection
-      if (failedRpcErrorCount > 0) {
-        console.info(
-          `Successfully connected to ${url} after ${failedRpcErrorCount} failed attempts`,
-        )
-      }
-      return url
-    } catch (error) {
-      failedRpcErrorCount++
-      if (!rpcConnectOk) {
-        // Connection error
-        console.error(`Failed to connect to ${url}, trying next one...`, error)
-      } else if (rpcThresholdValue < 1) {
-        // Threshold error
-        console.error(
-          `Successfull connection to ${url} BUT failed to test rpcThresholdValue, trying next one...`,
-          error,
-        )
-      } else {
-        // General error
-        console.error(`Failed to connect to ${url}, trying next one...`, error)
-      }
-    }
-  }
-  console.error(
-    `All RPC URLs (${urls?.length}) failed to connect or test rpcThresholdValue`,
-    urls,
-  )
-  throw new Error(`All RPC URLs (${urls?.length}) failed for ${CHAINS_NAMES[chainId]} (chainId ${chainId})`)
-}
-*/
 
 /**
  * 
@@ -300,69 +236,6 @@ async function getWorkingRpc(chainId: number, checkRpcThresholds = true): Promis
   throw new Error(`All RPC URLs (${urls?.length}) failed for ${CHAINS_NAMES[chainId]} (chainId ${chainId})`)
 }
 
-/*
-async function getWorkingRpc(chainId: number, checkRpcThresholds = true): Promise<JsonRpcProvider> {
-  let rpcConnectOk = false
-  let rpcThresholdValue = 0
-  let failedRpcErrorCount = 0
-  const urls = getRpcUrls(chainId)
-  for (const url of urls) {
-    try {
-      rpcConnectOk = false
-      rpcThresholdValue = 0
-      const provider = new JsonRpcProvider(url)
-      const network = provider.getNetwork()
-      const currentBlockNumber = provider.getBlockNumber()
-      await Promise.all([network, currentBlockNumber])
-      rpcConnectOk = true
-      rpcThresholdValue = ! checkRpcThresholds ? 1 :
-        // Test for the maximum number of concurrent requests the provider can handle
-        await testRpcThresholds(
-        provider,
-        REG_ContractAddress,
-        5,
-        5,
-        5,
-        150,
-      )
-      if (rpcThresholdValue < 1) {
-        // Throw error if the threshold is 0
-        // Means the provider is not able to handle required concurrent requests number
-        // skip it and try next one
-        throw new Error('rpcThresholdValue returned 0')
-      }
-      // If any error has occurred before, log the successful connection
-      if (failedRpcErrorCount > 0) {
-        console.info(
-          `Successfully connected to ${url} after ${failedRpcErrorCount} failed attempts`,
-        )
-      }
-      return provider
-    } catch (error) {
-      failedRpcErrorCount++
-      if (!rpcConnectOk) {
-        // Connection error
-        console.error(`Failed to connect to ${url}, trying next one...`, error)
-      } else if (rpcThresholdValue < 1) {
-        // Threshold error
-        console.error(
-          `Successfull connection to ${url} BUT failed to test rpcThresholdValue, trying next one...`,
-          error,
-        )
-      } else {
-        // General error
-        console.error(`Failed to connect to ${url}, trying next one...`, error)
-      }
-    }
-  }
-  console.error(
-    `All RPC URLs (${urls?.length}) failed to connect or test rpcThresholdValue`,
-    urls,
-  )
-  throw new Error(`All RPC URLs (${urls?.length}) failed for ${CHAINS_NAMES[chainId]} (chainId ${chainId})`)
-}
-*/
-
 interface Providers {
   GnosisRpcProvider: JsonRpcProvider
   EthereumRpcProvider: JsonRpcProvider
@@ -377,7 +250,6 @@ interface ProvidersWithUrls extends Providers {
 
 
 let initializeProvidersQueue: WaitingQueue<ProvidersWithUrls> | null = null
-// let providers: Providers | undefined = undefined
 let providers: ProvidersWithUrls | undefined = undefined
 
 export const initializeProviders = async () => {
@@ -385,14 +257,11 @@ export const initializeProviders = async () => {
     return initializeProvidersQueue.wait()
   }
   initializeProvidersQueue = new WaitingQueue()
-  // const [GnosisRpcProvider, EthereumRpcProvider] = await Promise.all([
-  //   getWorkingRpc(CHAIN_ID_GNOSIS_XDAI),
-  //   getWorkingRpc(CHAIN_ID_ETHEREUM),
-  // ])
-const [GnosisRpcProviderWithUrl, EthereumRpcProviderWithUrl] = await Promise.all([
-    getWorkingRpc(CHAIN_ID_GNOSIS_XDAI),
-    getWorkingRpc(CHAIN_ID_ETHEREUM),
-  ])
+  
+  const [GnosisRpcProviderWithUrl, EthereumRpcProviderWithUrl] = await Promise.all([
+      getWorkingRpc(CHAIN_ID_GNOSIS_XDAI),
+      getWorkingRpc(CHAIN_ID_ETHEREUM),
+    ])
   providers = { 
     GnosisRpcProvider: GnosisRpcProviderWithUrl.provider,
     EthereumRpcProvider: EthereumRpcProviderWithUrl.provider,
