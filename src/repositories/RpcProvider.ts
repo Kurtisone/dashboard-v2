@@ -1,3 +1,5 @@
+import { CHAINS as RealtCommonsDefaultChainsConfig } from '@realtoken/realt-commons'
+
 import {
   Contract,
   JsonRpcProvider,
@@ -34,24 +36,25 @@ declare module 'ethers' {
  * @throws Error if the chain ID is not supported
  */
 const getRpcUrls = (chainId: number): string[] => {
-  // Get the environment variable name and default urls based on the chain ID
+  // Get the environment variable name and default urls plus default RPC URL from realt-commons config based on the chain ID
   let envVarName = ''
   let defaultUrls: string[] = []
 
   switch (chainId) {
     case CHAIN_ID_ETHEREUM:
       envVarName = 'RPC_URLS_ETH_MAINNET'
-      defaultUrls = DEFAULT_ETHEREUM_RPC_URLS
+      // Use the default Ethereum RPC URLs from realt-commons config
+      defaultUrls = DEFAULT_ETHEREUM_RPC_URLS.concat(
+        RealtCommonsDefaultChainsConfig[CHAIN_ID_ETHEREUM].rpcUrl,
+      )
       break
     case CHAIN_ID_GNOSIS_XDAI:
       envVarName = 'RPC_URLS_GNOSIS_MAINNET'
-      defaultUrls = DEFAULT_GNOSIS_RPC_URLS
+      defaultUrls = DEFAULT_GNOSIS_RPC_URLS.concat(
+        RealtCommonsDefaultChainsConfig[CHAIN_ID_GNOSIS_XDAI].rpcUrl,
+      )
       break
     // TODO: Polygon
-    case CHAIN_ID_POLYGON:
-      envVarName = ''
-      defaultUrls = []
-      break
     default:
       throw new Error(`Unsupported chain ID: ${chainId}`)
   }
@@ -191,6 +194,7 @@ async function getWorkingRpc(
   let rpcThresholdValue = 0
   let failedRpcErrorCount = 0
   const urls = getRpcUrls(chainId)
+
   for (const url of urls) {
     try {
       rpcConnectOk = false
