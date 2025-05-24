@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 
 import { ActionIcon, Badge, Box, Button, Flex, Menu } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { closeModal, useModals } from '@mantine/modals'
+import { useModals } from '@mantine/modals'
 import { IconWallet } from '@tabler/icons'
 import { useWeb3React } from '@web3-react/core'
 
@@ -107,18 +107,9 @@ const ConnectWalletButton: FC<{ onClick?: () => void }> = (props) => {
     dispatch(setUserAddress(''))
   }, [connector])
 
-  // TEST
-  const onCloseWalletModal = () => {
-    console.error("onCloseWalletModal")
-  }
-  // TEST
-  const onOpenModal = () => {
-    console.error("onOpenModal")
-  }
-
   const openWalletModal = () => {
     props.onClick?.()
-    modals.openContextModal('web3Wallets', { innerProps: { openModal: onOpenModal, closeModal: onCloseWalletModal, closeContextModal: onCloseWalletModal} })
+    modals.openContextModal('web3Wallets', { innerProps: {} })
   }
 
   return account ? (
