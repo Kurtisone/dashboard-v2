@@ -115,19 +115,17 @@ const App = ({
   }, [])
 
   // Customize chains config for Gnosis and Ethereum
-  // using rpc urls from the environment variables
+  // using rpc urls from from props
   const CustomChainsConfig = {
     // Keep Goerli as testnet else an error will arise at init
     [ChainsID.Goerli]: RealtCommonsDefaultChainsConfig[ChainsID.Goerli],
     [ChainsID.Gnosis]: {
       ...RealtCommonsDefaultChainsConfig[ChainsID.Gnosis],
-      // Use the values from props
       rpcUrl:
         GnosisRpcUrl || RealtCommonsDefaultChainsConfig[ChainsID.Gnosis].rpcUrl,
     },
     [ChainsID.Ethereum]: {
       ...RealtCommonsDefaultChainsConfig[ChainsID.Ethereum],
-      // Use the values from props
       rpcUrl:
         EthereumRpcUrl ||
         RealtCommonsDefaultChainsConfig[ChainsID.Ethereum].rpcUrl,
