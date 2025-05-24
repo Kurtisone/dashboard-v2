@@ -13,7 +13,6 @@ import {
   CHAINS_NAMES,
   CHAIN_ID_ETHEREUM,
   CHAIN_ID_GNOSIS_XDAI,
-  CHAIN_ID_POLYGON,
   REG_ContractAddress,
 } from 'src/utils/blockchain/consts/otherTokens'
 import { batchCallOneContractOneFunctionMultipleParams } from 'src/utils/blockchain/contract'
